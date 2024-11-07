@@ -45,7 +45,7 @@ store_value:
     blt t1, a1, loop_start  # If t1 < a1, continue loop
 
 exit:
-    jr ra                # Return from function
+    ret                # Return from function
 
 error:
     li a0, 36          

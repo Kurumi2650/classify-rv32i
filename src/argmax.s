@@ -25,13 +25,32 @@ argmax:
     li t6, 1
     blt a1, t6, handle_error
 
-    lw t0, 0(a0)
+    lw t0, 0(a0)       # t0 = max_value = array[0]
+    li t1, 0           # t1 = max_index = 0
+    li t2, 1           # t2 = current index = 1
 
-    li t1, 0
-    li t2, 1
 loop_start:
-    # TODO: Add your own implementation
+    bge t2, a1, exit   # if current index >= array length, exit
 
+    slli t3, t2, 2     # t3 = t2 * 4
+    add  t4, a0, t3    # t4 = address of array[t2]
+    lw   t5, 0(t4)     # t5 = array[t2]
+
+    blt t0, t5, update_max
+    j next_element
+
+update_max:
+    mv  t0, t5          # t0 = max_value = array[t2]
+    mv  t1, t2          # t1 = max_index = t2
+
+next_element:
+    addi t2, t2, 1      # t2 = t2 + 1
+    j loop_start
+
+exit:
+    mv a0, t1           # Return the index in a0
+    ret
+    
 handle_error:
     li a0, 36
     j exit
