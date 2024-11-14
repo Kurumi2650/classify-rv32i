@@ -30,7 +30,7 @@ argmax:
     li t2, 1           # t2 = current index = 1
 
 loop_start:
-    bge t2, a1, exit   # if current index >= array length, exit
+    bge t2, a1, end   # if current index >= array length, end
 
     slli t3, t2, 2     # t3 = t2 * 4
     add  t4, a0, t3    # t4 = address of array[t2]
@@ -47,10 +47,14 @@ next_element:
     addi t2, t2, 1      # t2 = t2 + 1
     j loop_start
 
-exit:
+end:
     mv a0, t1           # Return the index in a0
     ret
     
 handle_error:
     li a0, 36
     j exit
+    
+exit:
+    li a7, 10
+    ecall

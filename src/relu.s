@@ -44,9 +44,12 @@ store_value:
     addi t1, t1, 1       # t1++
     blt t1, a1, loop_start  # If t1 < a1, continue loop
 
-exit:
     ret                # Return from function
 
 error:
-    li a0, 36          
-    j exit      
+    li a0, 36 
+    j exit
+exit:
+    mv a1, a0    
+    li a0, 17
+    ecall   

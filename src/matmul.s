@@ -1,3 +1,4 @@
+
 .globl matmul
 
 .text
@@ -115,8 +116,34 @@ inner_loop_start:
     j inner_loop_start
     
 inner_loop_end:
-    # TODO: Add your own implementation
+    # TODO: Add your own implementationss
+    # Move to the next row in M0
+    slli t1, a2, 2             # t1 = 4 * number of columns in M0
+    add s3, s3, t1             # Move pointer to the next row in M0
+    addi s0, s0, 1             # Increment row index
+    j outer_loop_start         # Repeat outer loop
+    
+outer_loop_end:
+    # Epilogue: Restore callee-saved registers and return
+    lw ra, 0(sp)
+    lw s0, 4(sp)
+    lw s1, 8(sp)
+    lw s2, 12(sp)
+    lw s3, 16(sp)
+    lw s4, 20(sp)
+    lw s5, 24(sp)
+    addi sp, sp, 28
+    jr ra
+
 
 error:
     li a0, 38
     j exit
+
+exit:
+    mv a1, a0
+    li a0, 17
+    ecall
+    
+    
+    

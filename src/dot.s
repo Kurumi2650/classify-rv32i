@@ -131,5 +131,6 @@ set_error_36:
     j exit
 
 exit:
-    li a7, 10                  # Syscall code for exit
+    mv a1, a0
+    li a0, 17                  # Syscall code for exit
     ecall                      # Exit the program
