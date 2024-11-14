@@ -167,6 +167,16 @@ classify:
     lw t0, 0(s3)
     lw t1, 0(s8)
     # mul a0, t0, t1 # FIXME: Replace 'mul' with your own implementation
+    mv a0, x0            # a0 = result (initialize to 0)
+    mv t2, t1            # t2 = loop counter for t1
+matmul_h_loop:
+    beq t2, x0, matmul_h_done  # Exit loop when t2 == 0
+    add a0, a0, t0             # Add rows of m0 to a0
+    addi t2, t2, -1            # Decrement t2
+    j matmul_h_loop            # Repeat loop
+
+matmul_h_done:
+    
     slli a0, a0, 2
     jal malloc 
     beq a0, x0, error_malloc
@@ -203,8 +213,20 @@ classify:
     mv a0, s9 # move h to the first argument
     lw t0, 0(s3)
     lw t1, 0(s8)
+    mv a1, x0              # a1 = length of h array (initialize to 0)
+    mv t2, t1              # t2 = loop counter
     # mul a1, t0, t1 # length of h array and set it as second argument
     # FIXME: Replace 'mul' with your own implementation
+
+relu_h_loop:
+    beq t2, x0, relu_h_done  # Exit loop when t2 == 0
+    add a1, a1, t0           # Add rows of m0 to a1
+    addi t2, t2, -1          # Decrement t2
+    j relu_h_loop            # Repeat loop
+
+relu_h_done:
+
+
     
     jal relu
     
@@ -226,7 +248,18 @@ classify:
     
     lw t0, 0(s3)
     lw t1, 0(s6)
+    mv a0, x0            # a0 = result (initialize to 0)
+    mv t2, t1            # t2 = loop counter for t1
     # mul a0, t0, t1 # FIXME: Replace 'mul' with your own implementation
+
+matmul_o_loop:
+    beq t2, x0, matmul_o_done  # Exit loop when t2 == 0
+    add a0, a0, t0             # Add rows of m0 to a0
+    addi t2, t2, -1            # Decrement t2
+    j matmul_o_loop            # Repeat loop
+
+matmul_o_done:
+
     slli a0, a0, 2
     jal malloc 
     beq a0, x0, error_malloc
@@ -286,8 +319,18 @@ classify:
     mv a0, s10 # load o array into first arg
     lw t0, 0(s3)
     lw t1, 0(s6)
-    mul a1, t0, t1 # load length of array into second arg
+    mv a1, x0            # a1 = result (initialize to 0)
+    mv t2, t1            # t2 = loop counter for t1
+    # mul a1, t0, t1 # load length of array into second arg
     # FIXME: Replace 'mul' with your own implementation
+    
+argmax_loop:
+    beq t2, x0, argmax_done  # Exit loop when t2 == 0
+    add a1, a1, t0           # Add rows of m0 to a1
+    addi t2, t2, -1          # Decrement t2
+    j argmax_loop            # Repeat loop
+
+argmax_done:
     
     jal argmax
     

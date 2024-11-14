@@ -63,6 +63,16 @@ write_matrix:
 
     # mul s4, s2, s3   # s4 = total elements
     # FIXME: Replace 'mul' with your own implementation
+    mv s4, x0            # Initialize s4 = 0 (result)
+    mv t0, s3            # t0 will serve as the loop counter
+
+calculate_product:
+    beq t0, x0, product_done # Exit loop when t0 == 0
+    add s4, s4, s2           # Add s2 to s4
+    addi t0, t0, -1          # Decrement loop counter
+    j calculate_product      # Repeat loop
+
+product_done:
 
     # write matrix data to file
     mv a0, s0

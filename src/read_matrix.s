@@ -79,13 +79,13 @@ read_matrix:
     mv s1, x0            # Initialize s1 = 0 (result)
     mv t3, t2            # t3 will serve as a loop counter
 
-    calculate_product:
-        beq t3, x0, product_done # Exit loop when t3 == 0
-        add s1, s1, t1           # Add t1 to s1
-        addi t3, t3, -1          # Decrement loop counter
-        j calculate_product      # Repeat loop
+calculate_product:
+    beq t3, x0, product_done # Exit loop when t3 == 0
+    add s1, s1, t1           # Add t1 to s1
+    addi t3, t3, -1          # Decrement loop counter
+    j calculate_product      # Repeat loop
 
-    product_done:
+product_done:
     slli t3, s1, 2         # t3 = s1 * 4 (size in bytes)
 
     slli t3, s1, 2
