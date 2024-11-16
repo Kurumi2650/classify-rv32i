@@ -166,16 +166,17 @@ classify:
     
     lw t0, 0(s3)
     lw t1, 0(s8)
-    # mul a0, t0, t1 # FIXME: Replace 'mul' with your own implementation
-    mv a0, x0            # a0 = result (initialize to 0)
-    mv t2, t1            # t2 = loop counter for t1
-matmul_h_loop:
-    beq t2, x0, matmul_h_done  # Exit loop when t2 == 0
-    add a0, a0, t0             # Add rows of m0 to a0
-    addi t2, t2, -1            # Decrement t2
-    j matmul_h_loop            # Repeat loop
-
-matmul_h_done:
+    # mul a0, t0, t1 
+    # FIXME: Replace 'mul' with your own implementation
+    mv a0, x0 # initialize result (a0) to 0
+binary_mul_h_loop:
+    andi t2, t1, 1   # Check the leas significant bit of t1
+    beqz t2, skip_add_h    # if the bit is 0, skip the addition
+    add  a0, a0, t0
+skip_add_h:
+    slli t0, t0, 1
+    srli t1, t1, 1
+    bnez t1, binary_mul_h_loop # Repeat until all bits are processed
     
     slli a0, a0, 2
     jal malloc 
@@ -213,19 +214,18 @@ matmul_h_done:
     mv a0, s9 # move h to the first argument
     lw t0, 0(s3)
     lw t1, 0(s8)
-    mv a1, x0              # a1 = length of h array (initialize to 0)
-    mv t2, t1              # t2 = loop counter
     # mul a1, t0, t1 # length of h array and set it as second argument
     # FIXME: Replace 'mul' with your own implementation
 
-relu_h_loop:
-    beq t2, x0, relu_h_done  # Exit loop when t2 == 0
-    add a1, a1, t0           # Add rows of m0 to a1
-    addi t2, t2, -1          # Decrement t2
-    j relu_h_loop            # Repeat loop
-
-relu_h_done:
-
+    mv a1, x0 # initialize result (a0) to 0
+binary_mul_relu_loop:
+    andi t2, t1, 1   # Check the leas significant bit of t1
+    beqz t2, skip_add_relu    # if the bit is 0, skip the addition
+    add  a1, a1, t0
+skip_add_relu:
+    slli t0, t0, 1
+    srli t1, t1, 1
+    bnez t1, binary_mul_relu_loop # Repeat until all bits are processed
 
     
     jal relu
@@ -248,17 +248,18 @@ relu_h_done:
     
     lw t0, 0(s3)
     lw t1, 0(s6)
-    mv a0, x0            # a0 = result (initialize to 0)
-    mv t2, t1            # t2 = loop counter for t1
     # mul a0, t0, t1 # FIXME: Replace 'mul' with your own implementation
 
-matmul_o_loop:
-    beq t2, x0, matmul_o_done  # Exit loop when t2 == 0
-    add a0, a0, t0             # Add rows of m0 to a0
-    addi t2, t2, -1            # Decrement t2
-    j matmul_o_loop            # Repeat loop
 
-matmul_o_done:
+    mv a0, x0
+binary_mul_o_loop:
+    andi t2, t1, 1   # Check the leas significant bit of t1
+    beqz t2, skip_add_o    # if the bit is 0, skip the addition
+    add  a0, a0, t0
+skip_add_o:
+    slli t0, t0, 1
+    srli t1, t1, 1
+    bnez t1, binary_mul_o_loop # Repeat until all bits are processed
 
     slli a0, a0, 2
     jal malloc 
@@ -319,18 +320,18 @@ matmul_o_done:
     mv a0, s10 # load o array into first arg
     lw t0, 0(s3)
     lw t1, 0(s6)
-    mv a1, x0            # a1 = result (initialize to 0)
-    mv t2, t1            # t2 = loop counter for t1
     # mul a1, t0, t1 # load length of array into second arg
     # FIXME: Replace 'mul' with your own implementation
     
-argmax_loop:
-    beq t2, x0, argmax_done  # Exit loop when t2 == 0
-    add a1, a1, t0           # Add rows of m0 to a1
-    addi t2, t2, -1          # Decrement t2
-    j argmax_loop            # Repeat loop
-
-argmax_done:
+    mv a1, x0
+binary_mul_arg_loop:
+    andi t2, t1, 1   # Check the leas significant bit of t1
+    beqz t2, skip_add_arg    # if the bit is 0, skip the addition
+    add  a1, a1, t0
+skip_add_arg:
+    slli t0, t0, 1
+    srli t1, t1, 1
+    bnez t1, binary_mul_arg_loop # Repeat until all bits are processed
     
     jal argmax
     
