@@ -63,16 +63,18 @@ write_matrix:
 
     # mul s4, s2, s3   # s4 = total elements
     # FIXME: Replace 'mul' with your own implementation
-    mv s4, x0            # Initialize s4 = 0 (result)
-    mv t0, s3            # t0 will serve as the loop counter
+    mv s4, x0              # Initialize s4 = 0 (result accumulator)
+    mv t0, s3              # t0 = s3 (multiplier)
 
-calculate_product:
-    beq t0, x0, product_done # Exit loop when t0 == 0
-    add s4, s4, s2           # Add s2 to s4
-    addi t0, t0, -1          # Decrement loop counter
-    j calculate_product      # Repeat loop
+binary_mult_loop:
+    andi t1, t0, 1         # Extract LSB of multiplier (t0)
+    beq t1, x0, skip_add   # If LSB is 0, skip addition
+    add s4, s4, s2         # Add multiplicand (s2) to result (s4)
 
-product_done:
+skip_add:
+    slli s2, s2, 1         # Left shift multiplicand (s2 <<= 1)
+    srli t0, t0, 1         # Right shift multiplier (t0 >>= 1)
+    bnez t0, binary_mult_loop # Continue until multiplier is 0
 
     # write matrix data to file
     mv a0, s0

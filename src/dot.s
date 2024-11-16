@@ -60,12 +60,9 @@ loop_start:
     lw t6, 0(t2)               # t6 = arr0[i * stride0]
     lw s0, 0(t3)               # s0 = arr1[i * stride1]
 
-    # Begin multiplication without 'mul' instruction
-    # Determine signs of t6 and s0
+    # Determine the sign of the result
     slt s1, t6, zero           # s1 = 1 if t6 < 0, 0 otherwise
     slt s2, s0, zero           # s2 = 1 if s0 < 0, 0 otherwise
-
-    # Determine the sign of the result
     xor s3, s1, s2             # s3 = s1 XOR s2 (1 if result is negative)
 
     # Compute absolute values
@@ -76,19 +73,17 @@ skip_abs_t6:
     neg s0, s0                 # s0 = -s0
 skip_abs_s0:
 
-    # Initialize product accumulator
-    li s4, 0                   # s4 will hold the product
+    # Binary Multiplication Implementation
+    li s4, 0                   # Initialize product accumulator (s4)
 
-mult_loop:
-    beq s0, zero, mult_end     # If multiplier is zero, end multiplication
-    andi s5, s0, 1             # s5 = s0 & 1
-    beq s5, zero, skip_add
-    add s4, s4, t6             # s4 += t6
+binary_mult_loop:
+    andi s5, s0, 1             # Extract LSB of multiplier
+    beq s5, zero, skip_add     # If LSB is 0, skip addition
+    add s4, s4, t6             # Add multiplicand to product accumulator
 skip_add:
-    slli t6, t6, 1              # t6 <<= 1
-    srli s0, s0, 1             # s0 >>= 1 (logical shift right)
-    j mult_loop
-mult_end:
+    slli t6, t6, 1             # Left shift multiplicand
+    srli s0, s0, 1             # Right shift multiplier
+    bnez s0, binary_mult_loop  # Continue until multiplier is zero
 
     # Adjust the sign of the product
     beq s3, zero, skip_negate
@@ -96,11 +91,11 @@ mult_end:
 skip_negate:
 
     # Add product to the sum
-    add t0, t0, s4             # t0 += s4
+    add t0, t0, s4             # Accumulate product into sum
 
     # Increment pointers
-    add t2, t2, t4             # t2 += stride0 * 4
-    add t3, t3, t5             # t3 += stride1 * 4
+    add t2, t2, t4             # Advance arr0 pointer by stride0
+    add t3, t3, t5             # Advance arr1 pointer by stride1
 
     # Increment loop index
     addi t1, t1, 1             # i += 1

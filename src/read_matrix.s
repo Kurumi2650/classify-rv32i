@@ -76,17 +76,21 @@ read_matrix:
 
     # mul s1, t1, t2   # s1 is number of elements
     # FIXME: Replace 'mul' with your own implementation
-    mv s1, x0            # Initialize s1 = 0 (result)
-    mv t3, t2            # t3 will serve as a loop counter
+    # Compute the number of elements in the matrix (t1 * t2)
+    mv s1, x0              # Initialize s1 = 0 (result accumulator)
+    mv t3, t2              # Copy t2 (multiplier) into t3 for manipulation
 
-calculate_product:
-    beq t3, x0, product_done # Exit loop when t3 == 0
-    add s1, s1, t1           # Add t1 to s1
-    addi t3, t3, -1          # Decrement loop counter
-    j calculate_product      # Repeat loop
+binary_mult_loop:
+    andi t4, t3, 1         # Extract LSB of multiplier (t3)
+    beq t4, x0, skip_add   # If LSB is 0, skip addition
+    add s1, s1, t1         # Add multiplicand (t1) to result (s1)
 
-product_done:
-    slli t3, s1, 2         # t3 = s1 * 4 (size in bytes)
+skip_add:
+    slli t1, t1, 1         # Left shift multiplicand (t1 <<= 1)
+    srli t3, t3, 1         # Right shift multiplier (t3 >>= 1)
+    bnez t3, binary_mult_loop # Continue until multiplier is 0
+
+    # At this point, s1 contains the total number of elements in the matrix
 
     slli t3, s1, 2
     sw t3, 24(sp)    # size in bytes
